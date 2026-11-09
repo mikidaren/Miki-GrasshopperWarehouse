@@ -49,7 +49,8 @@ def validate(root, index):
         seen.add(label)
         if item["category"] not in categories:
             errors.append(label + " has unknown category")
-        if item["units"] != "m" or item["stage"] != "concept-test-assumptions" or item["runtime"] != "rhino9-net8-grasshopper":
+        if (item["units"] != "m" or item["stage"] not in ("concept-test-assumptions", "standard-candidate")
+                or item["runtime"] != "rhino9-net8-grasshopper"):
             errors.append(label + " has unsupported units, runtime or stage")
         if not isinstance(item["tags"], list) or not item["tags"] or any(not isinstance(tag, str) or not re.fullmatch(r"[a-z0-9-]{1,64}", tag) for tag in item["tags"]):
             errors.append(label + " has invalid tags")
@@ -151,9 +152,58 @@ def validate_standard_baseline(root):
     return errors
 
 
+def evaluate_design_profile(root, index):
+    """Evaluate declared defaults against the candidate design profile.
+
+    These are generator guardrails, not an assertion that the whole building or a
+    project-specific circulation route complies with a Standard.
+    """
+    baseline = read_json(root / "policies/iceworld-standard-baseline.json")
+    dimensions = baseline["profiles"]["temporary-exhibition"]["dimensions"]
+    findings = []
+    for item in index["examples"]:
+        source = read_json((root / item["source"]).resolve())
+        values = source["parameters"]
+        kind = item["kind"]
+        if kind in ("straight-stair", "switchback-stair"):
+            flights = 2 if kind == "switchback-stair" else 1
+            single_rise = values.get("rise", 1.8) / flights
+            steps_per_flight = values.get("risers", 12)
+            going = values.get("run", 3.6) / steps_per_flight
+            riser = single_rise / steps_per_flight
+            width = values.get("width", 1.5)
+            guard = values.get("railHeight", 1.1)
+            checks = [
+                ("treadGoing", going >= dimensions["treadGoing"]["minimumM"],
+                 "stair going {:.3f} m is below {:.2f} m".format(going, dimensions["treadGoing"]["minimumM"])),
+                ("riserHeight", riser <= dimensions["riserHeight"]["maximumM"],
+                 "stair riser {:.3f} m exceeds {:.2f} m".format(riser, dimensions["riserHeight"]["maximumM"])),
+                ("stairWidth", width >= dimensions["stairWidth"]["minimumM"],
+                 "stair width {:.3f} m is below {:.2f} m".format(width, dimensions["stairWidth"]["minimumM"])),
+                ("guardHeight", guard >= dimensions["guardHeight"]["minimumM"],
+                 "guard height {:.3f} m is below {:.2f} m".format(guard, dimensions["guardHeight"]["minimumM"])),
+                ("stairFlightSteps", dimensions["stairFlightSteps"]["minimum"] <= steps_per_flight <= dimensions["stairFlightSteps"]["maximum"],
+                 "stair flight has {} steps; profile permits {}-{}".format(
+                     steps_per_flight, dimensions["stairFlightSteps"]["minimum"], dimensions["stairFlightSteps"]["maximum"])),
+            ]
+            findings.extend({"id": item["id"], "check": check, "passed": passed, "message": message}
+                            for check, passed, message in checks)
+        elif kind == "platform-railing":
+            guard = values.get("railHeight", 1.1)
+            findings.append({"id": item["id"], "check": "guardHeight",
+                             "passed": guard >= dimensions["guardHeight"]["minimumM"],
+                             "message": "guard height {:.3f} m is below {:.2f} m".format(guard, dimensions["guardHeight"]["minimumM"])})
+    return findings
+
+
 if __name__ == "__main__":
     root = pathlib.Path(__file__).resolve().parents[1]
-    errors = validate(root, read_json(root / "examples/index.json"))
+    index = read_json(root / "examples/index.json")
+    errors = validate(root, index)
     errors += validate_standard_baseline(root)
+    findings = evaluate_design_profile(root, index)
+    gated_ids = {item["id"] for item in index["examples"] if item["stage"] == "standard-candidate"}
+    errors += [finding["id"] + " standard candidate: " + finding["message"]
+               for finding in findings if finding["id"] in gated_ids and not finding["passed"]]
     print("\n".join(errors) if errors else "PASS warehouse index")
     sys.exit(bool(errors))

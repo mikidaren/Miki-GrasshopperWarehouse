@@ -38,9 +38,10 @@ Copy-Item -Path (Join-Path $repository 'examples/iceworld/*.ghx') -Destination (
 Copy-Item -Path (Join-Path $repository 'examples/iceworld/*.json') -Destination (Join-Path $package 'examples/iceworld')
 Copy-Item -LiteralPath (Join-Path $repository 'examples/iceworld/README.md') -Destination (Join-Path $package 'README.zh-CN.md')
 Copy-Item -LiteralPath (Join-Path $repository 'examples/index.json') -Destination (Join-Path $package 'examples/index.json')
-foreach ($file in @('warehouse-index.md', 'approval-rules.md', 'iceworld-validation.md', 'iceworld-native-validation.json')) {
+foreach ($file in @('warehouse-index.md', 'approval-rules.md', 'iceworld-standard-baseline.md', 'iceworld-validation.md', 'iceworld-native-validation.json')) {
     Copy-Item -LiteralPath (Join-Path $repository "docs/$file") -Destination (Join-Path $package 'docs')
 }
+Copy-Item -LiteralPath (Join-Path $repository 'policies/iceworld-standard-baseline.json') -Destination (Join-Path $package 'docs/iceworld-standard-baseline.json')
 foreach ($kind in @('straight-stair', 'switchback-stair', 'platform-railing', 'queue-barriers', 'curved-ice-wall', 'spiral-ornament')) {
     Copy-Item -LiteralPath (Join-Path $qaPath "$kind.3dm") -Destination (Join-Path $package 'models')
     Copy-Item -LiteralPath (Join-Path $qaPath "$kind.png") -Destination (Join-Path $package 'previews')
