@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/Miki.OpenBim/Miki.OpenBim.csproj" />
+    <None Include="../../examples/two-storey.json" Link="two-storey.json" CopyToOutputDirectory="PreserveNewest" Condition="Exists('../../examples/two-storey.json')" />
+  </ItemGroup>
+</Project>

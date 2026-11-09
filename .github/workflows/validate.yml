@@ -1,0 +1,26 @@
+name: Validate lightweight OpenBIM
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  domain-and-ifc:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: dotnet run --project tests/Domain.Tests --configuration Release
+      - run: python -m pip install -r python/requirements.txt
+      - run: python -m unittest discover -s tests -p 'test_ifc*.py' -v
+  native-build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - run: dotnet build src/Miki.OpenBim.Rhino --configuration Release --nologo

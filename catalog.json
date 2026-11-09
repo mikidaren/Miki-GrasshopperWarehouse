@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "name": "Miki-GrasshopperWarehouse",
+  "version": "0.1.0",
+  "units": "m",
+  "tools": [
+    {
+      "id": "architectural.lightweight-project",
+      "runtime": "dotnet8-rhino9",
+      "entry": "Miki.OpenBim.Rhino.RhinoModel",
+      "operations": ["ApplyJson", "PatchJson", "InspectJson", "ReadProjectJson"],
+      "contract": "docs/schema-v1.md",
+      "example": "examples/two-storey.json",
+      "features": ["plan-axes", "space-zones", "straight-walls", "real-openings", "shared-blocks", "slab-voids", "straight-stairs", "dependency-patches"]
+    },
+    {
+      "id": "exchange.ifc4",
+      "runtime": "python3.12-ifcopenshell-0.9.0.post1",
+      "entry": "python/miki_ifc.py",
+      "operations": ["export", "inspect"],
+      "verification": "reopen-relations-and-opencascade-geometry"
+    }
+  ]
+}

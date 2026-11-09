@@ -1,0 +1,63 @@
+# Miki-GrasshopperWarehouse
+
+Reusable lightweight OpenBIM kernels for Rhino 9, Grasshopper and the Miki-Rhino / Magpie-Rhino workspace.
+
+This library targets concept and developed architectural design. Supply plan positions, storey heights, wall thickness and simple door/window forms. Materials, wall build-ups, reinforcement and construction-junction specifications are deliberately not required.
+
+## What is here
+
+- `src/Miki.OpenBim`: portable project contract, validation, small ID-based patches and dependency calculation.
+- `src/Miki.OpenBim.Rhino`: real RhinoCommon curves, closed Breps, wall voids, slabs, conceptual stairs and shared Block definitions.
+- `python/miki_ifc.py`: optional IFC4 exchange and actual geometry readback using IfcOpenShell.
+- `examples/two-storey.json`: a generic 12 × 8 m two-storey test building, not a proposed design for a real project.
+- `tests`: portable contract and IFC tests. Native geometry additionally requires Rhino 9.
+
+The initial toolkit is a reusable compiled parametric kernel, not a collection of finished visual `.gh` documents. It can be called from a Rhino plugin or a Grasshopper C# component; it does not require the AI to regenerate source code for every window or wall.
+
+## Minimal edits
+
+Lengths are metres. A type edit is a compact patch, not a new modeling script:
+
+```json
+{"types":[{"id":"WIN-A","width":1.5}]}
+```
+
+The engine finds every instance of that type and its host wall. The native adapter updates the shared Block and real wall openings. Different types retain their geometry. A level edit follows the same rule:
+
+```json
+{"levels":[{"id":"L2","height":3.5}]}
+```
+
+Changing one level's height does not implicitly move another level's explicitly assigned elevation. Specify that elevation in the same patch when that is the intended design change.
+
+## Validation
+
+```text
+dotnet run --project tests/Domain.Tests --configuration Release
+python -m pip install -r python/requirements.txt
+python -m unittest discover -s tests -p "test_ifc*.py" -v
+python python/miki_ifc.py export --project examples/two-storey.json --output two-storey.ifc --report two-storey.validation.json
+```
+
+Use an isolated Python 3.12 environment. The Rhino adapter builds against RhinoCommon 9; it must execute inside Rhino, not a normal .NET process.
+
+IFC export is not verified by the presence of a file alone. The worker reopens the IFC, checks storeys/types/void and filling relationships and creates actual OpenCASCADE shapes for geometric comparisons. Source JSON and native `.3dm` remain the editable parametric source; IFC exchange does not promise a Revit family or a Grasshopper history round trip.
+
+## Native API
+
+```text
+RhinoModel.ApplyJson(document, projectJson)
+RhinoModel.PatchJson(document, patchJson)
+RhinoModel.InspectJson(document)
+RhinoModel.ReadProjectJson(document)
+```
+
+The caller owns the undo record and UI-thread scheduling. The adapter stores source on an undoable hidden metadata object and mirrors it in document strings. It refuses to overwrite manually edited or missing managed geometry. Unrelated objects are not adopted or modified.
+
+## Boundaries
+
+- Straight walls, rectangular door/window types and straight conceptual stairs are the first supported tool family.
+- Shared geometry is implemented with actual Rhino Block definitions and instances.
+- No automatic code-compliance, structural analysis, fabrication or construction-detail claims.
+- No model-provider account keys, network calls or code downloads in the kernels.
+- Product integration consumes a pinned local source snapshot. Updating the library is an explicit developer action.
