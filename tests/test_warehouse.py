@@ -38,6 +38,19 @@ class WarehouseTests(unittest.TestCase):
         self.index["examples"][0]["validation"]["grasshopper"] = "probably"
         self.assertTrue(any("state" in e for e in validator.validate(ROOT, self.index)))
 
+    def test_standard_baseline_is_traceable_and_explicitly_candidate(self):
+        self.assertEqual(validator.validate_standard_baseline(ROOT), [])
+
+    def test_missing_specialist_ice_standard_rejected(self):
+        baseline = validator.read_json(ROOT / "policies/iceworld-standard-baseline.json")
+        baseline["standards"] = [item for item in baseline["standards"] if item["id"] != "GB 51202-2016"]
+        import tempfile
+        with tempfile.TemporaryDirectory() as directory:
+            temporary = pathlib.Path(directory)
+            (temporary / "policies").mkdir()
+            (temporary / "policies/iceworld-standard-baseline.json").write_text(
+                __import__("json").dumps(baseline, ensure_ascii=False), encoding="utf-8")
+            self.assertTrue(any("Required" in error for error in validator.validate_standard_baseline(temporary)))
 
 if __name__ == "__main__":
     unittest.main()

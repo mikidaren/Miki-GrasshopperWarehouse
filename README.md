@@ -14,6 +14,7 @@ This library targets concept and developed architectural design. Supply plan pos
 - `examples/iceworld`: six slider-driven Grasshopper `.ghx` examples for stairs, handrails, queue barriers, curved ice blocks and spiral ornament.
 - `src/Miki.IceWorld` and `src/Miki.IceWorld.Grasshopper`: bounded numeric geometry, native Breps and policy-enforced new-object bake components.
 - `examples/index.json`, `docs/warehouse-index.md` and `docs/approval-rules.md`: classified examples and separate GitHub/host approval rules.
+- `policies/iceworld-standard-baseline.json` and `docs/iceworld-standard-baseline.md`: Chinese Standard design baselines, with project-specific fire, structural, accessibility and ice-durability review kept explicit.
 
 The architectural toolkit is a reusable compiled parametric kernel callable from a Rhino plugin or a Grasshopper C# component. The IceWorld collection also supplies visual `.ghx` documents with numeric sliders and grouped inputs/outputs. Chinese setup and example instructions are in [examples/iceworld/README.md](examples/iceworld/README.md).
 
@@ -62,5 +63,6 @@ The caller owns the undo record and UI-thread scheduling. The adapter stores sou
 - Straight walls, rectangular door/window types and straight conceptual stairs are the first supported tool family.
 - Shared geometry is implemented with actual Rhino Block definitions and instances.
 - No automatic code-compliance, structural analysis, fabrication or construction-detail claims.
+- Chinese Standard baselines configure concept and developed-design parameters. Passing a parameter check does not replace project-specific fire, structural, accessibility or GB 51202-2016 review.
 - No model-provider account keys, network calls or code downloads in the kernels.
 - Product integration consumes a pinned local source snapshot. Updating the library is an explicit developer action.

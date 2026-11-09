@@ -33,6 +33,18 @@ async function approve({ github, context, core }) {
     if (!eligibility({ repository, defaultBranch, run, pr: current, files }).eligible) continue;
     await github.rest.pulls.createReview({ owner, repo, pull_number: pr.number, commit_id: pr.head.sha, event: 'APPROVE',
       body: 'Automatic warehouse intake review passed for numeric examples and index documentation. Validation covers the referenced commit. Native geometry validation remains separately recorded in the example index.' });
+    // Merge and deletion use the separately re-read state and the same validated commit.
+    const { data: mergeable } = await github.rest.pulls.get({ owner, repo, pull_number: pr.number });
+    if (!eligibility({ repository, defaultBranch, run, pr: mergeable, files }).eligible) continue;
+    const headBranch = mergeable.head.ref;
+    const merge = await github.rest.pulls.merge({ owner, repo, pull_number: pr.number, sha: mergeable.head.sha,
+      merge_method: 'squash', commit_title: `Warehouse: ${mergeable.title} (#${pr.number})` });
+    core.info(`PR #${pr.number} merge: ${merge.data.merged ? 'completed' : 'not completed'}`);
+    if (!merge.data.merged) continue;
+    if (mergeable.head.repo.full_name === repository) {
+      await github.rest.git.deleteRef({ owner, repo, ref: `heads/${headBranch}` });
+      core.info(`PR #${pr.number}: deleted ${headBranch} after merge.`);
+    }
   }
 }
 module.exports = { eligibility, approve };

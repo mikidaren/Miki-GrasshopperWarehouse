@@ -4,7 +4,7 @@ on:
     workflows: [Validate lightweight OpenBIM]
     types: [completed]
 permissions:
-  contents: read
+  contents: write
   pull-requests: write
 concurrency:
   group: warehouse-approval-${{ github.event.workflow_run.head_branch }}

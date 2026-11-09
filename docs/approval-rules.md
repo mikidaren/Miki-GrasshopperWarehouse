@@ -6,7 +6,7 @@
 
 `auto-approve.yml` 在该验证 workflow 完成后运行。它只检出默认分支，读取默认分支的审批脚本，通过 GitHub API 获取 PR 和文件列表。此流程需要先合入默认分支才能接收 workflow_run 事件。
 
-自动 APPROVE 需要同时满足以下条件。
+自动 APPROVE、SQUASH MERGE 与删除 head 分支需要同时满足以下条件。
 
 - 验证结果成功，事件来自 pull_request，workflow 路径为 `.github/workflows/validate.yml`。
 - PR 已开放、已退出 Draft、目标为默认分支。
@@ -14,10 +14,14 @@
 - 作者是本仓库 OWNER、MEMBER 或 COLLABORATOR，账号类型为 User，head 位于本仓库。
 - 变更涉及 1–100 个文件，只新增或修改 `examples/iceworld/*.json`、`examples/index.json`、`docs/warehouse-index.md` 或 `examples/iceworld/README.md`。
 - 同一 head 尚未收到此机器人批准。
+- 批准后、合并前再次读取的 PR 仍为当前已验证 head，且 open、非草稿、目标为默认分支。
+- 合并响应确认成功。之后只删除同一仓库内的当前 PR head 分支。
 
-代码、审批策略、CI、原生验证证据、GHX、二进制、重命名和删除均进入维护者审查。批准绑定已验证的 commit，写入批准前再次读取 PR。
+代码、审批策略、CI、原生验证证据、GHX、二进制、重命名和删除均进入维护者审查。批准绑定已验证的 commit，写入批准前再次读取 PR；合并请求也绑定该 head SHA。
 
-仓库 Settings → Actions → General → Workflow permissions 中的 “Allow GitHub Actions to create and approve pull requests” 必须启用，否则 GitHub 会拒绝机器人审批。维护者可将现有验证 jobs 设为分支保护的必需检查。当前规则执行自动审查批准，合并由仓库的合并流程处理。
+仓库 Settings → Actions → General → Workflow permissions 中的 “Allow GitHub Actions to create and approve pull requests” 必须启用，否则 GitHub 会拒绝机器人审批。维护者应把 `domain-and-ifc` 与 `native-build` 设为 `main` 的必需状态检查。工作流对 `contents` 使用写权限，仅用于删除成功合并后的同仓库 head 分支。
+
+该自动流程只自动处理限定路径的数值示例与索引文档。示例 GHX、代码、策略和二进制变更仍需人工审查与合并。
 
 ## Rhino／Grasshopper 执行审批
 

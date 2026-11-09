@@ -98,8 +98,62 @@ def validate(root, index):
     return errors
 
 
+def validate_standard_baseline(root):
+    """Check that the standards traceability layer is machine-readable and explicit."""
+    errors = []
+    path = root / "policies/iceworld-standard-baseline.json"
+    try:
+        baseline = read_json(path)
+    except (OSError, ValueError, json.JSONDecodeError) as error:
+        return ["Standard baseline cannot be read — " + str(error)]
+    if set(baseline) != {"schemaVersion", "jurisdiction", "scope", "reviewStatus", "standards", "profiles", "manualReview"}:
+        return ["Standard baseline fields do not match schema"]
+    if baseline["schemaVersion"] != 1 or baseline["jurisdiction"] != "CN-HLJ":
+        errors.append("Unsupported standard baseline schema or jurisdiction")
+    if baseline["reviewStatus"] not in ("candidate", "approved"):
+        errors.append("Unknown standard baseline review state")
+    if not isinstance(baseline["scope"], str) or not baseline["scope"]:
+        errors.append("Standard baseline scope is required")
+    standards = baseline["standards"]
+    required_standards = {"GB 51202-2016", "GB 55031-2022", "GB 50352-2019", "GB 55037-2022",
+                          "GB 55019-2021", "DB23/T 3792-2024", "HLJ-ICE-GUIDE-2023"}
+    if not isinstance(standards, list) or not required_standards.issubset({item.get("id") for item in standards if isinstance(item, dict)}):
+        errors.append("Required Chinese standards are missing")
+    else:
+        for item in standards:
+            if set(item) != {"id", "title", "status", "appliesTo", "source", "verifiedOn"}:
+                errors.append("Standard fields do not match schema — " + str(item.get("id")))
+                continue
+            if item["status"] != "current" or not item["title"] or not item["appliesTo"]:
+                errors.append("Standard is not a current, named requirement — " + item["id"])
+            if not re.fullmatch(r"https?://\S+", item["source"]):
+                errors.append("Standard source is not a URL — " + item["id"])
+            if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", item["verifiedOn"]):
+                errors.append("Standard verification date is invalid — " + item["id"])
+    profile = baseline["profiles"].get("temporary-exhibition") if isinstance(baseline["profiles"], dict) else None
+    if not isinstance(profile, dict) or not isinstance(profile.get("dimensions"), dict):
+        errors.append("temporary-exhibition dimension profile is missing")
+    else:
+        dimensions = profile["dimensions"]
+        expected = {"treadGoing", "riserHeight", "stairWidth", "guardHeight", "stairFlightSteps", "outdoorEgressStairPitchDegrees"}
+        if set(dimensions) != expected:
+            errors.append("Standard dimension profile fields do not match schema")
+        for name, dimension in dimensions.items():
+            if not isinstance(dimension, dict) or "clause" not in dimension or "applicability" not in dimension:
+                errors.append("Dimension rule lacks traceability — " + name)
+                continue
+            numeric = {key: value for key, value in dimension.items() if key not in ("clause", "applicability")}
+            if not numeric or any(not isinstance(value, (int, float)) for value in numeric.values()):
+                errors.append("Dimension rule has invalid numeric bounds — " + name)
+    reviews = baseline["manualReview"]
+    if not isinstance(reviews, list) or not reviews or any(not isinstance(item, dict) or not item.get("id") or not item.get("requirement") or not item.get("reason") for item in reviews):
+        errors.append("Manual review obligations are incomplete")
+    return errors
+
+
 if __name__ == "__main__":
     root = pathlib.Path(__file__).resolve().parents[1]
     errors = validate(root, read_json(root / "examples/index.json"))
+    errors += validate_standard_baseline(root)
     print("\n".join(errors) if errors else "PASS warehouse index")
     sys.exit(bool(errors))

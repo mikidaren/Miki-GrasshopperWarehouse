@@ -2,6 +2,10 @@
 
 `catalog.json` 列出工具族与 API。`examples/index.json` 列出可直接使用的示例。每个示例占一条索引记录。
 
+## 参数标准基线
+
+`policies/iceworld-standard-baseline.json` 保存中国标准的机器可读依据和候选参数值，说明见 `docs/iceworld-standard-baseline.md`。`candidate` 表示参数待适用专业复核，不代表示例或方案已经取得工程合规结论。消防疏散、结构、无障碍、冻融耐久及冰雪景观专项事项保留为明确的人工复核项。
+
 ## 稳定身份
 
 - `id` 使用大写 ASCII 字母、数字、点、下划线和连字符，最多 128 字符。示例以 `IW-` 开头，例如 `IW-STRAIGHT-STAIR`。

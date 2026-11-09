@@ -52,3 +52,53 @@ test('retargeted PR is rechecked before writing approval', async () => {
   await approve({ github, context, core: { info() {} } });
   assert.equal(written.length, 0);
 });
+
+test('eligible pull request is approved, squash-merged and its same-repository branch deleted', async () => {
+  const f = fixture(); f.pr.number = 1; f.pr.title = 'Add an example';
+  f.pr.head = { sha: 'abc', ref: 'codex/add-example', repo: { full_name: f.repository } };
+  const reads = [f.pr, f.pr, f.pr];
+  const written = [];
+  const merges = [];
+  const deletions = [];
+  const listFiles = async () => {};
+  const github = {
+    paginate: async method => method === listFiles ? f.files : [],
+    rest: { pulls: {
+      get: async () => ({ data: reads.shift() }), listFiles, listReviews: async () => {},
+      createReview: async review => written.push(review),
+      merge: async request => { merges.push(request); return { data: { merged: true } }; }
+    }, git: { deleteRef: async request => deletions.push(request) } }
+  };
+  const context = { repo: { owner: 'mikidaren', repo: 'Miki-GrasshopperWarehouse' },
+    payload: { workflow_run: { ...f.run, pull_requests: [{ number: 1 }] }, repository: { default_branch: 'main' } } };
+  await approve({ github, context, core: { info() {} } });
+  assert.equal(written.length, 1);
+  assert.deepEqual(merges[0], { owner: 'mikidaren', repo: 'Miki-GrasshopperWarehouse', pull_number: 1,
+    sha: 'abc', merge_method: 'squash', commit_title: 'Warehouse: Add an example (#1)' });
+  assert.deepEqual(deletions[0], { owner: 'mikidaren', repo: 'Miki-GrasshopperWarehouse',
+    ref: 'heads/codex/add-example' });
+});
+
+test('stale head before merge does not merge, delete or write another review', async () => {
+  const f = fixture(); f.pr.number = 1;
+  f.pr.head = { sha: 'abc', ref: 'codex/add-example', repo: { full_name: f.repository } };
+  const reads = [f.pr, f.pr, { ...f.pr, head: { ...f.pr.head, sha: 'new' } }];
+  const written = [];
+  const merges = [];
+  const deletions = [];
+  const listFiles = async () => {};
+  const github = {
+    paginate: async method => method === listFiles ? f.files : [],
+    rest: { pulls: {
+      get: async () => ({ data: reads.shift() }), listFiles, listReviews: async () => {},
+      createReview: async review => written.push(review),
+      merge: async request => merges.push(request)
+    }, git: { deleteRef: async request => deletions.push(request) } }
+  };
+  const context = { repo: { owner: 'mikidaren', repo: 'Miki-GrasshopperWarehouse' },
+    payload: { workflow_run: { ...f.run, pull_requests: [{ number: 1 }] }, repository: { default_branch: 'main' } } };
+  await approve({ github, context, core: { info() {} } });
+  assert.equal(written.length, 1);
+  assert.equal(merges.length, 0);
+  assert.equal(deletions.length, 0);
+});
