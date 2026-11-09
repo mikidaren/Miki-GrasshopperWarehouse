@@ -1,0 +1,13 @@
+{
+  "id": "IW-QUEUE-BARRIERS",
+  "kind": "queue-barriers",
+  "parameters": {
+    "length": 8,
+    "laneWidth": 1.5,
+    "lanes": 4,
+    "turnGap": 1.8,
+    "railHeight": 1.1,
+    "railRadius": 0.025,
+    "postSpacing": 1
+  }
+}

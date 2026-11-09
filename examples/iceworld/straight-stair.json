@@ -1,0 +1,13 @@
+{
+  "id": "IW-STRAIGHT-STAIR",
+  "kind": "straight-stair",
+  "parameters": {
+    "rise": 1.8,
+    "run": 3.6,
+    "width": 1.5,
+    "risers": 12,
+    "railHeight": 1.1,
+    "railRadius": 0.025,
+    "postSpacing": 1
+  }
+}

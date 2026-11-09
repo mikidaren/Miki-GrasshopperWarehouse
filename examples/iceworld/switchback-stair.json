@@ -1,0 +1,14 @@
+{
+  "id": "IW-SWITCHBACK-STAIR",
+  "kind": "switchback-stair",
+  "parameters": {
+    "rise": 3.6,
+    "run": 3.6,
+    "width": 1.5,
+    "risers": 12,
+    "gap": 0.2,
+    "railHeight": 1.1,
+    "railRadius": 0.025,
+    "postSpacing": 1
+  }
+}
