@@ -28,13 +28,25 @@ public sealed record ExecutionPolicy(int Version, int MaximumParts, bool AutoBak
 public sealed record ApprovalDecision(bool Automatic, string Reason);
 public static class ExecutionGate
 {
-    public static ApprovalDecision Evaluate(string operation, ExampleDefinition source, ExecutionPolicy policy, bool existingObjects)
+    public static ApprovalDecision Evaluate(string operation, ExampleDefinition source, ExecutionPolicy policy,
+        bool existingObjects, StandardBaseline? standards = null, StandardDesignContext? context = null)
     {
         try
         {
             policy.Validate();
             var model = ExampleEngine.Build(source);
             if (model.PartCount > policy.MaximumParts) return new(false, "Generated geometry exceeds the local policy budget.");
+            StandardAssessment? assessment = null;
+            if (standards is not null)
+            {
+                assessment = standards.Assess(source, context ?? new StandardDesignContext());
+                if (assessment.Blocking && operation == "bake")
+                {
+                    string failures = string.Join(" ", assessment.Findings
+                        .Where(item => item.Blocking).Select(item => item.Message));
+                    return new(false, "Standard-candidate profile check failed. " + failures);
+                }
+            }
             return operation switch
             {
                 "inspect" or "preview" => new(true, "Validated read-only operation."),

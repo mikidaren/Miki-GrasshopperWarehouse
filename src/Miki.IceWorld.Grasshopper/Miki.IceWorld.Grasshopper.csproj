@@ -8,10 +8,11 @@
     <NoWarn>$(NoWarn);NU1701</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="../Miki.IceWorld/Miki.IceWorld.csproj" />
+    <ProjectReference Include="../Miki.IceWorld.Rhino/Miki.IceWorld.Rhino.csproj" />
     <PackageReference Include="Grasshopper" Version="9.0.26132.12305-wip" ExcludeAssets="runtime" />
     <PackageReference Include="RhinoCommon" Version="9.0.26132.12305-wip" ExcludeAssets="runtime" />
     <None Include="../../policies/execution.json" Link="execution.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../policies/iceworld-standard-baseline.json" Link="iceworld-standard-baseline.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <Target Name="CopyGrasshopperAssembly" AfterTargets="Build">
     <Copy SourceFiles="$(TargetPath)" DestinationFiles="$(TargetDir)$(AssemblyName).gha" />

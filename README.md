@@ -12,11 +12,13 @@ This library targets concept and developed architectural design. Supply plan pos
 - `examples/two-storey.json`: a generic 12 × 8 m two-storey test building, not a proposed design for a real project.
 - `tests`: portable contract and IFC tests. Native geometry additionally requires Rhino 9.
 - `examples/iceworld`: six slider-driven Grasshopper `.ghx` examples for stairs, handrails, queue barriers, curved ice blocks and spiral ornament.
-- `src/Miki.IceWorld` and `src/Miki.IceWorld.Grasshopper`: bounded numeric geometry, native Breps and policy-enforced new-object bake components.
+- `src/Miki.IceWorld`, `src/Miki.IceWorld.Rhino` and `src/Miki.IceWorld.Grasshopper`: bounded numeric geometry, a stable Rhino adapter for Miki plugins, and policy-enforced Grasshopper components.
 - `examples/index.json`, `docs/warehouse-index.md` and `docs/approval-rules.md`: classified examples and separate GitHub/host approval rules.
 - `policies/iceworld-standard-baseline.json` and `docs/iceworld-standard-baseline.md`: Chinese Standard design baselines, with project-specific fire, structural, accessibility and ice-durability review kept explicit.
 
 The architectural toolkit is a reusable compiled parametric kernel callable from a Rhino plugin or a Grasshopper C# component. The IceWorld collection also supplies visual `.ghx` documents with numeric sliders and grouped inputs/outputs. Chinese setup and example instructions are in [examples/iceworld/README.md](examples/iceworld/README.md).
+
+Miki `.rhp` integration is available through `Miki.IceWorld.Rhino.dll` and `RhinoModel.BuildIceWorld` / `BakeIceWorld`. The adapter resolves examples by stable ID, verifies catalog hashes and applies the standard-candidate bake gate. Integration details and installation layout are in [docs/plugin-integration.md](docs/plugin-integration.md).
 
 ## Minimal edits
 
@@ -54,6 +56,8 @@ RhinoModel.ApplyJson(document, projectJson)
 RhinoModel.PatchJson(document, patchJson)
 RhinoModel.InspectJson(document)
 RhinoModel.ReadProjectJson(document)
+RhinoModel.BuildIceWorld(document, warehouseRoot, exampleId, context)
+RhinoModel.BakeIceWorld(document, warehouseRoot, exampleId, context)
 ```
 
 The caller owns the undo record and UI-thread scheduling. The adapter stores source on an undoable hidden metadata object and mirrors it in document strings. It refuses to overwrite manually edited or missing managed geometry. Unrelated objects are not adopted or modified.
@@ -64,5 +68,6 @@ The caller owns the undo record and UI-thread scheduling. The adapter stores sou
 - Shared geometry is implemented with actual Rhino Block definitions and instances.
 - No automatic code-compliance, structural analysis, fabrication or construction-detail claims.
 - Chinese Standard baselines configure concept and developed-design parameters. Passing a parameter check does not replace project-specific fire, structural, accessibility or GB 51202-2016 review.
+- Standard-candidate examples are blocked from automatic Bake when their declared stair or guard parameters fail the configured baseline. Existing concept examples remain visual concept tests and their hashes are unchanged.
 - No model-provider account keys, network calls or code downloads in the kernels.
 - Product integration consumes a pinned local source snapshot. Updating the library is an explicit developer action.

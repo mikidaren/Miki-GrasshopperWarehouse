@@ -5,7 +5,7 @@
 ## 安装与打开
 
 1. 使用 Windows Rhino 9 和 Grasshopper，Rhino 使用 .NET 8 或兼容运行时。
-2. 发布包用户将 `plugin/` 中的三个文件复制到同一个 Grasshopper Libraries 子目录。源码用户先编译 `src/Miki.IceWorld.Grasshopper`，使用输出的 `Miki.IceWorld.Grasshopper.gha`、`Miki.IceWorld.dll` 和 `execution.json`。通过 Grasshopper 的 File → Special Folders → Components Folder 打开安装位置。
+2. 发布包用户把 `plugin/` 放在单一安装目录。Grasshopper 用户将该目录加入 Components Folder，并保留同目录中的 `Miki.IceWorld.dll`、`Miki.IceWorld.Rhino.dll`、`execution.json` 和 `iceworld-standard-baseline.json`。Miki 插件直接引用 `Miki.IceWorld.Rhino.dll`，接口见 `docs/plugin-integration.md`。
 3. 下载包如被 Windows 标记为阻止，先在 ZIP 属性中解除阻止，再解压。重启 Rhino。
 4. 打开任意 `.ghx`，调整左侧滑块，观察 Rhino 预览与右侧参数报告。
 5. 按 `Button` 后，`Approved Bake` 读取安装目录的 `execution.json`，校验参数并新建 Rhino 对象。文档中的长度会按单位自动换算。
@@ -26,6 +26,8 @@ Libraries 中保留一份插件。`Grasshopper.dll`、`GH_IO.dll` 和 `RhinoComm
 | `spiral-ornament.ghx` | 圆柱包络上的螺旋装饰带 | 半径 2 m，高 3 m，3 圈，带半径 0.04 m |
 
 `.json` 保存可调用的数值参数，`.ghx` 保存带滑块的画布。两种入口均使用相同的编译内核。修改 JSON 会影响使用该 JSON 的调用，修改 GH 滑块会影响当前 GH 定义。需要同步默认值时重新生成 GHX，并更新索引验证记录。
+
+当前六套文件继续标记为 `concept-test-assumptions`，保持既有几何和验证哈希。后续新增或迁移到中国标准参数轮廓的示例使用 `standard-candidate`，并通过同一目录 API 在 Bake 前执行标准门槛。
 
 ## 参数与输出
 

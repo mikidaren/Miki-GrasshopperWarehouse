@@ -6,7 +6,7 @@ using Rhino.Geometry;
 internal static class PreviewRenderer
 {
     // Orthographic software preview of the actual validated native geometry.
-    public static void Render(string path, string title, Miki.IceWorld.Grasshopper.NativeExample model)
+    public static void Render(string path, string title, Miki.IceWorld.Rhino.NativeExample model)
     {
         var triangles = new List<(Point3d[] Points, string Role)>();
         for (int i = 0; i < model.Geometry.Length; i++)

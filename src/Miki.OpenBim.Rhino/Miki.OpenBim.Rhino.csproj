@@ -7,6 +7,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../Miki.OpenBim/Miki.OpenBim.csproj" />
+    <ProjectReference Include="../Miki.IceWorld.Rhino/Miki.IceWorld.Rhino.csproj" />
     <PackageReference Include="RhinoCommon" Version="9.0.26132.12305-wip" ExcludeAssets="runtime" />
   </ItemGroup>
 </Project>

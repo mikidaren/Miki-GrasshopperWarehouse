@@ -16,6 +16,15 @@
       "features": ["straight-stair-handrails", "switchback-stair-handrails", "platform-railing", "queue-barriers", "curved-ice-blocks", "spiral-ornament"]
     },
     {
+      "id": "iceworld.plugin-integration",
+      "runtime": "dotnet8-rhino9",
+      "entry": "Miki.IceWorld.Rhino.IceWorldRhino",
+      "operations": ["BuildFromCatalog", "BakeFromCatalog"],
+      "index": "examples/index.json",
+      "contract": "docs/plugin-integration.md",
+      "standardBaseline": "policies/iceworld-standard-baseline.json"
+    },
+    {
       "id": "architectural.lightweight-project",
       "runtime": "dotnet8-rhino9",
       "entry": "Miki.OpenBim.Rhino.RhinoModel",

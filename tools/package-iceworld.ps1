@@ -27,21 +27,46 @@ $buildProcess.WaitForExit()
 Write-Output $buildOutput
 Write-Error $buildErrors -ErrorAction SilentlyContinue
 if ($buildProcess.ExitCode -ne 0) { throw "Grasshopper build failed with exit code $($buildProcess.ExitCode)." }
+$openBimBuildStart = New-Object System.Diagnostics.ProcessStartInfo
+$openBimBuildStart.FileName = $dotnet.Source
+$openBimBuildStart.Arguments = 'build "' + (Join-Path $repository 'src/Miki.OpenBim.Rhino') + '" --configuration Release --nologo'
+$openBimBuildStart.WorkingDirectory = $repository
+$openBimBuildStart.UseShellExecute = $false
+$openBimBuildStart.RedirectStandardOutput = $true
+$openBimBuildStart.RedirectStandardError = $true
+$openBimBuildProcess = New-Object System.Diagnostics.Process
+$openBimBuildProcess.StartInfo = $openBimBuildStart
+if (-not $openBimBuildProcess.Start()) { throw 'Could not start the Miki OpenBIM Rhino build.' }
+$openBimBuildOutput = $openBimBuildProcess.StandardOutput.ReadToEnd()
+$openBimBuildErrors = $openBimBuildProcess.StandardError.ReadToEnd()
+$openBimBuildProcess.WaitForExit()
+Write-Output $openBimBuildOutput
+Write-Error $openBimBuildErrors -ErrorAction SilentlyContinue
+if ($openBimBuildProcess.ExitCode -ne 0) { throw "Miki OpenBIM Rhino build failed with exit code $($openBimBuildProcess.ExitCode)." }
 $binary = Join-Path $repository 'src/Miki.IceWorld.Grasshopper/bin/Release/net8.0-windows'
+$openBimBinary = Join-Path $repository 'src/Miki.OpenBim.Rhino/bin/Release/net8.0-windows'
 foreach ($directory in @('plugin', 'examples/iceworld', 'models', 'previews', 'docs')) {
     New-Item -ItemType Directory -Path (Join-Path $package $directory) -Force | Out-Null
 }
-foreach ($file in @('Miki.IceWorld.Grasshopper.gha', 'Miki.IceWorld.dll', 'execution.json')) {
+foreach ($file in @('Miki.IceWorld.Grasshopper.gha', 'Miki.IceWorld.dll', 'Miki.IceWorld.Rhino.dll', 'execution.json', 'iceworld-standard-baseline.json')) {
     Copy-Item -LiteralPath (Join-Path $binary $file) -Destination (Join-Path $package 'plugin')
+}
+foreach ($file in @('Miki.OpenBim.dll', 'Miki.OpenBim.Rhino.dll')) {
+    Copy-Item -LiteralPath (Join-Path $openBimBinary $file) -Destination (Join-Path $package 'plugin')
 }
 Copy-Item -Path (Join-Path $repository 'examples/iceworld/*.ghx') -Destination (Join-Path $package 'examples/iceworld')
 Copy-Item -Path (Join-Path $repository 'examples/iceworld/*.json') -Destination (Join-Path $package 'examples/iceworld')
 Copy-Item -LiteralPath (Join-Path $repository 'examples/iceworld/README.md') -Destination (Join-Path $package 'README.zh-CN.md')
 Copy-Item -LiteralPath (Join-Path $repository 'examples/index.json') -Destination (Join-Path $package 'examples/index.json')
-foreach ($file in @('warehouse-index.md', 'approval-rules.md', 'iceworld-standard-baseline.md', 'iceworld-validation.md', 'iceworld-native-validation.json')) {
+foreach ($file in @('warehouse-index.md', 'approval-rules.md', 'iceworld-standard-baseline.md', 'plugin-integration.md', 'iceworld-validation.md', 'iceworld-native-validation.json')) {
     Copy-Item -LiteralPath (Join-Path $repository "docs/$file") -Destination (Join-Path $package 'docs')
 }
 Copy-Item -LiteralPath (Join-Path $repository 'policies/iceworld-standard-baseline.json') -Destination (Join-Path $package 'docs/iceworld-standard-baseline.json')
+foreach ($directory in @('policies', 'examples')) { New-Item -ItemType Directory -Path (Join-Path $package $directory) -Force | Out-Null }
+Copy-Item -LiteralPath (Join-Path $repository 'policies/execution.json') -Destination (Join-Path $package 'policies/execution.json')
+Copy-Item -LiteralPath (Join-Path $repository 'policies/iceworld-standard-baseline.json') -Destination (Join-Path $package 'policies/iceworld-standard-baseline.json')
+Copy-Item -LiteralPath (Join-Path $repository 'examples/index.json') -Destination (Join-Path $package 'examples/index.json')
+Copy-Item -Path (Join-Path $repository 'examples/iceworld/*.json') -Destination (Join-Path $package 'examples/iceworld')
 foreach ($kind in @('straight-stair', 'switchback-stair', 'platform-railing', 'queue-barriers', 'curved-ice-wall', 'spiral-ornament')) {
     Copy-Item -LiteralPath (Join-Path $qaPath "$kind.3dm") -Destination (Join-Path $package 'models')
     Copy-Item -LiteralPath (Join-Path $qaPath "$kind.png") -Destination (Join-Path $package 'previews')

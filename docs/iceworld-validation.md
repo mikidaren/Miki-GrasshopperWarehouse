@@ -12,10 +12,11 @@ python -m unittest discover -s tests -p "test_warehouse*.py" -v
 python -m unittest discover -s tests -p "test_ifc*.py" -v
 node --test .github/scripts/approval.test.cjs
 dotnet build src/Miki.OpenBim.Rhino --configuration Release
+dotnet build src/Miki.IceWorld.Rhino --configuration Release
 dotnet build src/Miki.IceWorld.Grasshopper --configuration Release
 ```
 
-Python 使用独立的 3.12 环境，依赖由 `python/requirements.txt` 固定。原有领域测试 210 项、IFC 测试 43 项、新增几何／执行审批与数值源测试 29 项、分类索引回归 6 项和 GitHub 审批策略测试 8 项均通过。
+Python 使用独立的 3.12 环境，依赖由 `python/requirements.txt` 固定。原生适配拆分后，IceWorld 内核、目录、标准门槛与数值源测试 32 项和仓储目录 API 测试 30 项通过。原有领域与 IFC 测试继续由 CI 执行。
 
 ## 原生验证
 
@@ -35,6 +36,8 @@ dotnet run --project tools/IceWorld.NativeQA --configuration Release -- "E:/WORK
 | 螺旋装饰带 | 1 | 通过 | 通过 | 通过 |
 
 合计 194 个封闭 Brep。每个模型已写出 `.3dm` 并重新打开检查有效性与封闭性。每个示例还验证了重复烘焙被拒绝且原有对象数量保持一致。
+
+Miki OpenBIM 单入口另在独立无窗口文档中通过真实目录读取，完成六套示例预览和直跑楼梯 Bake。该检查同时覆盖索引哈希、稳定 ID、Rhino Group 与新增对象数量；没有改写仓库中的源 JSON 或 GHX。
 
 ## 组件加载回归
 

@@ -29,7 +29,9 @@
 
 索引包含 ID、生成器、中文标题、主分类、标签、源路径、GH 定义路径、单位、运行环境、设计阶段和验证记录。路径必须位于 `examples/iceworld/`，并指向存在的 `.json` 或 `.ghx`。每个源文件与定义文件只归属一条记录，新增文件需要入索引。
 
-当前单位为 `m`，运行环境为 `rhino9-net8-grasshopper`，阶段为 `concept-test-assumptions`。参数名称、默认值、范围及整数要求由 `ExampleEngine.Parameters` 定义，画布滑块与 JSON 使用同一组参数。
+当前单位为 `m`，运行环境为 `rhino9-net8-grasshopper`。现有六套保持 `concept-test-assumptions`，后续中国标准参数迁移使用 `standard-candidate`。参数名称、默认值、范围及整数要求由 `ExampleEngine.Parameters` 定义，画布滑块、插件目录 API 与 JSON 使用同一组参数。
+
+`WarehouseCatalog.Load(root)` 会验证索引、路径、源 ID、稳定哈希及策略文件。Miki 插件按 ID 调用 `BuildFromCatalog` 或 `BakeFromCatalog`，不硬编码示例路径。`standard-candidate` 的阻断参数失败时，预览仍可读取，自动 Bake 拒绝执行。
 
 ## 画布和 Rhino 分组
 
