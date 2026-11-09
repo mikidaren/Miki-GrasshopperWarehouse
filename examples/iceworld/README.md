@@ -12,7 +12,7 @@
 
 Libraries 中保留一份插件。`Grasshopper.dll`、`GH_IO.dll` 和 `RhinoCommon.dll` 由 Rhino 提供。发布包只包含 Miki 插件和它的领域程序集。
 
-如果启动时弹出 `Component ID conflict`，并同时指向同一个 Rhino 自带 `Grasshopper.dll`，先点击 `Skip All`。关闭 Rhino，打开 File → Special Folders → Components Folder，确认 Miki 文件只安装一份，并删除从 Rhino `Plug-ins\Grasshopper` 复制过来的 `Grasshopper.dll`。不要注册或复制 Rhino 自带的 `Grasshopper.dll`、`GH_IO.dll` 或 `RhinoCommon.dll`。清理 Libraries 中重复的 Miki 旧版本，重启 Rhino 后重新打开 GHX。
+如果启动时弹出 `Component ID conflict`，并同时指向同一个 Rhino 自带 `Grasshopper.dll`，先点击 `Skip All`。关闭 Rhino，打开 File → Special Folders → Components Folder，确认 Miki 文件只安装一份。若 Components Folder 中误放了 `Grasshopper.dll`、`GH_IO.dll` 或 `RhinoCommon.dll` 副本，只删除这些副本，保留 Rhino 安装目录 `Plug-ins\Grasshopper` 下的原文件。清理重复的 Miki 旧版本后重启 Rhino，再重新打开 GHX。若冲突仍指向 Rhino 安装目录中的原文件，应使用当前发布包，旧 QA 重复注册内置程序集的问题已在其中修正。
 
 ## 示例目录
 
