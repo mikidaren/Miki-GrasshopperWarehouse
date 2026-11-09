@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <NoWarn>$(NoWarn);NU1701</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/Miki.IceWorld.Grasshopper/Miki.IceWorld.Grasshopper.csproj" />
+    <PackageReference Include="Rhino.Inside" Version="9.0.26084.13070-beta" />
+  </ItemGroup>
+  <Target Name="CopyQaGrasshopperAssembly" AfterTargets="Build">
+    <Copy SourceFiles="$(TargetDir)Miki.IceWorld.Grasshopper.dll" DestinationFiles="$(TargetDir)Miki.IceWorld.Grasshopper.gha" />
+  </Target>
+</Project>

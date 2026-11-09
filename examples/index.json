@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 1,
+  "categories": [
+    "circulation/stairs",
+    "circulation/railings",
+    "visitor-flow/queues",
+    "ice-construction/blocks",
+    "surface/ornament"
+  ],
+  "examples": [
+    {
+      "id": "IW-STRAIGHT-STAIR",
+      "kind": "straight-stair",
+      "title": "直跑楼梯与双侧扶手",
+      "category": "circulation/stairs",
+      "tags": [
+        "iceworld",
+        "straight",
+        "stair",
+        "handrail"
+      ],
+      "source": "examples/iceworld/straight-stair.json",
+      "definition": "examples/iceworld/straight-stair.ghx",
+      "units": "m",
+      "runtime": "rhino9-net8-grasshopper",
+      "stage": "concept-test-assumptions",
+      "validation": {
+        "portable": "passed",
+        "native": "passed",
+        "grasshopper": "passed",
+        "sourceSha256": "beecca1aee00354fd36d549eb759754b4a22082cf43840d05f11bce801faa53e",
+        "definitionSha256": "7c2308fdfc40946003f0d57305d5e645f424add6bb1f8199b35e75bacfd48c06"
+      }
+    },
+    {
+      "id": "IW-SWITCHBACK-STAIR",
+      "kind": "switchback-stair",
+      "title": "折返楼梯与平台连续扶手",
+      "category": "circulation/stairs",
+      "tags": [
+        "iceworld",
+        "switchback",
+        "stair",
+        "handrail",
+        "landing"
+      ],
+      "source": "examples/iceworld/switchback-stair.json",
+      "definition": "examples/iceworld/switchback-stair.ghx",
+      "units": "m",
+      "runtime": "rhino9-net8-grasshopper",
+      "stage": "concept-test-assumptions",
+      "validation": {
+        "portable": "passed",
+        "native": "passed",
+        "grasshopper": "passed",
+        "sourceSha256": "75d1f01db35fc594076d4df54160a4775d8f81a1cf409e67bd81e183e0e83467",
+        "definitionSha256": "68ebf34d49b8d88738a1d97fe814a99e10fb5b2a01bc43b95e666d1daa4c981b"
+      }
+    },
+    {
+      "id": "IW-PLATFORM-RAILING",
+      "kind": "platform-railing",
+      "title": "观景平台与三边栏杆",
+      "category": "circulation/railings",
+      "tags": [
+        "iceworld",
+        "platform",
+        "railing",
+        "entry"
+      ],
+      "source": "examples/iceworld/platform-railing.json",
+      "definition": "examples/iceworld/platform-railing.ghx",
+      "units": "m",
+      "runtime": "rhino9-net8-grasshopper",
+      "stage": "concept-test-assumptions",
+      "validation": {
+        "portable": "passed",
+        "native": "passed",
+        "grasshopper": "passed",
+        "sourceSha256": "6537798f3c7e1fe15a1ae48bacb5f126b617ff0d77318d1bec250d68102f0819",
+        "definitionSha256": "f8bc8aa8e83757e6a214ea39511f33f2c248478356c8b182a5607e541ac2cccd"
+      }
+    },
+    {
+      "id": "IW-QUEUE-BARRIERS",
+      "kind": "queue-barriers",
+      "title": "蛇形排队通道隔离栏",
+      "category": "visitor-flow/queues",
+      "tags": [
+        "iceworld",
+        "queue",
+        "barrier",
+        "modular"
+      ],
+      "source": "examples/iceworld/queue-barriers.json",
+      "definition": "examples/iceworld/queue-barriers.ghx",
+      "units": "m",
+      "runtime": "rhino9-net8-grasshopper",
+      "stage": "concept-test-assumptions",
+      "validation": {
+        "portable": "passed",
+        "native": "passed",
+        "grasshopper": "passed",
+        "sourceSha256": "02cbf157021dd621d5c9393fb57cd8dd5f87287643316c6294210ed7b02512a0",
+        "definitionSha256": "4908c7ea14c24b809a9dcb0371eb73d2c2e2806b4fd8bc0bc405732fa1e7059c"
+      }
+    },
+    {
+      "id": "IW-CURVED-ICE-WALL",
+      "kind": "curved-ice-wall",
+      "title": "弧形冰墙分层分块",
+      "category": "ice-construction/blocks",
+      "tags": [
+        "iceworld",
+        "curved",
+        "ice",
+        "blocks"
+      ],
+      "source": "examples/iceworld/curved-ice-wall.json",
+      "definition": "examples/iceworld/curved-ice-wall.ghx",
+      "units": "m",
+      "runtime": "rhino9-net8-grasshopper",
+      "stage": "concept-test-assumptions",
+      "validation": {
+        "portable": "passed",
+        "native": "passed",
+        "grasshopper": "passed",
+        "sourceSha256": "a7521f03c3ccf45ee2a9b92d2fe07d720dd9d1e07b58aed9c8fc8e6533beb1c4",
+        "definitionSha256": "d058cbf62c2e7cf3137b7ec4621d63ad8a3ed4fe7ec27a9bab737100ed163743"
+      }
+    },
+    {
+      "id": "IW-SPIRAL-ORNAMENT",
+      "kind": "spiral-ornament",
+      "title": "螺旋表皮装饰带",
+      "category": "surface/ornament",
+      "tags": [
+        "iceworld",
+        "spiral",
+        "surface",
+        "ornament"
+      ],
+      "source": "examples/iceworld/spiral-ornament.json",
+      "definition": "examples/iceworld/spiral-ornament.ghx",
+      "units": "m",
+      "runtime": "rhino9-net8-grasshopper",
+      "stage": "concept-test-assumptions",
+      "validation": {
+        "portable": "passed",
+        "native": "passed",
+        "grasshopper": "passed",
+        "sourceSha256": "b7486d22435f953356f654332d0da650f82cbbeacd000ff36a77a5edf65f3b30",
+        "definitionSha256": "7095440f07974a0e6c24a87a18c886f24d6a1ee20a335b8e3b14ad2f302c44a5"
+      }
+    }
+  ]
+}

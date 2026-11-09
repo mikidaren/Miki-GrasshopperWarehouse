@@ -5,6 +5,17 @@
   "units": "m",
   "tools": [
     {
+      "id": "iceworld.parametric-examples",
+      "runtime": "dotnet8-rhino9-grasshopper",
+      "entry": "Miki.IceWorld.Grasshopper",
+      "operations": ["preview", "inspect", "bake"],
+      "index": "examples/index.json",
+      "contract": "docs/warehouse-index.md",
+      "executionPolicy": "policies/execution.json",
+      "approvalRules": "docs/approval-rules.md",
+      "features": ["straight-stair-handrails", "switchback-stair-handrails", "platform-railing", "queue-barriers", "curved-ice-blocks", "spiral-ornament"]
+    },
+    {
       "id": "architectural.lightweight-project",
       "runtime": "dotnet8-rhino9",
       "entry": "Miki.OpenBim.Rhino.RhinoModel",

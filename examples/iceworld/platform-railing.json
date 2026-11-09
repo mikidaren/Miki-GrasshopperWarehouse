@@ -1,0 +1,12 @@
+{
+  "id": "IW-PLATFORM-RAILING",
+  "kind": "platform-railing",
+  "parameters": {
+    "length": 6,
+    "width": 4,
+    "elevation": 1.8,
+    "railHeight": 1.1,
+    "railRadius": 0.025,
+    "postSpacing": 1
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "id": "IW-CURVED-ICE-WALL",
+  "kind": "curved-ice-wall",
+  "parameters": {
+    "radius": 5,
+    "angle": 120,
+    "height": 2.4,
+    "thickness": 0.5,
+    "segments": 12,
+    "courses": 4,
+    "joint": 0.01
+  }
+}
