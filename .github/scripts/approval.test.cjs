@@ -53,6 +53,30 @@ test('retargeted PR is rechecked before writing approval', async () => {
   assert.equal(written.length, 0);
 });
 
+test('base retargeted during approval is rechecked before squash merge', async () => {
+  const f = fixture(); f.pr.number = 1; f.pr.title = 'Add an example';
+  f.pr.head = { sha: 'abc', ref: 'codex/add-example', repo: { full_name: f.repository } };
+  const reads = [f.pr, f.pr, { ...f.pr, base: { ref: 'release' } }];
+  const written = [];
+  const merges = [];
+  const deletions = [];
+  const listFiles = async () => {};
+  const github = {
+    paginate: async method => method === listFiles ? f.files : [],
+    rest: { pulls: {
+      get: async () => ({ data: reads.shift() }), listFiles, listReviews: async () => {},
+      createReview: async review => written.push(review),
+      merge: async request => merges.push(request)
+    }, git: { deleteRef: async request => deletions.push(request) } }
+  };
+  const context = { repo: { owner: 'mikidaren', repo: 'Miki-GrasshopperWarehouse' },
+    payload: { workflow_run: { ...f.run, pull_requests: [{ number: 1 }] }, repository: { default_branch: 'main' } } };
+  await approve({ github, context, core: { info() {} } });
+  assert.equal(written.length, 1);
+  assert.equal(merges.length, 0);
+  assert.equal(deletions.length, 0);
+});
+
 test('eligible pull request is approved, squash-merged and its same-repository branch deleted', async () => {
   const f = fixture(); f.pr.number = 1; f.pr.title = 'Add an example';
   f.pr.head = { sha: 'abc', ref: 'codex/add-example', repo: { full_name: f.repository } };
