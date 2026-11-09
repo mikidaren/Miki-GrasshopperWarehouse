@@ -7,7 +7,7 @@ using Rhino.Geometry;
 
 namespace Miki.OpenBim.Rhino;
 
-public static class RhinoModel
+public static partial class RhinoModel
 {
     private const string Section = "MikiOpenBim";
     private const string ProjectKey = "miki.project";

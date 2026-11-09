@@ -15,6 +15,7 @@ jobs:
           python-version: '3.12'
       - run: dotnet run --project tests/Domain.Tests --configuration Release
       - run: dotnet run --project tests/IceWorld.Tests --configuration Release -- --examples examples/iceworld
+      - run: dotnet run --project tests/IceWorld.Tests --configuration Release -- --warehouse .
       - run: python tools/validate_warehouse.py
       - run: python -m unittest discover -s tests -p 'test_warehouse*.py' -v
       - uses: actions/setup-node@v4
@@ -31,4 +32,5 @@ jobs:
         with:
           dotnet-version: '8.0.x'
       - run: dotnet build src/Miki.OpenBim.Rhino --configuration Release --nologo
+      - run: dotnet build src/Miki.IceWorld.Rhino --configuration Release --nologo
       - run: dotnet build src/Miki.IceWorld.Grasshopper --configuration Release --nologo

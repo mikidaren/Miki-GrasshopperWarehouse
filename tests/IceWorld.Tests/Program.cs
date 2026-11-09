@@ -93,6 +93,56 @@ Test("policy budget and disabled auto bake are enforced", () =>
     Check(!ExecutionGate.Evaluate("bake", source, ExecutionPolicy.Default with { MaximumParts = 2 }, false).Automatic);
     Check(!ExecutionGate.Evaluate("bake", source, ExecutionPolicy.Default with { AutoBake = false }, false).Automatic);
 });
+Test("candidate standard gate blocks only declared candidate bake failures", () =>
+{
+    string root = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../.."));
+    var standards = StandardBaseline.Load(Path.Combine(root, "policies/iceworld-standard-baseline.json"));
+    var source = new ExampleDefinition("IW-CANDIDATE", "straight-stair", new()
+    {
+        ["rise"] = 2.4
+    });
+    var concept = ExecutionGate.Evaluate("bake", source, ExecutionPolicy.Default, false, standards,
+        new StandardDesignContext(StandardDesignContext.Concept));
+    var candidate = ExecutionGate.Evaluate("bake", source, ExecutionPolicy.Default, false, standards,
+        new StandardDesignContext(StandardDesignContext.StandardCandidate));
+    var preview = ExecutionGate.Evaluate("preview", source, ExecutionPolicy.Default, false, standards,
+        new StandardDesignContext(StandardDesignContext.StandardCandidate));
+    Check(concept.Automatic);
+    Check(!candidate.Automatic && candidate.Reason.Contains("Standard-candidate", StringComparison.Ordinal));
+    Check(preview.Automatic);
+});
+Test("candidate standard gate accepts a declared compliant stair profile", () =>
+{
+    string root = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../.."));
+    var standards = StandardBaseline.Load(Path.Combine(root, "policies/iceworld-standard-baseline.json"));
+    var source = new ExampleDefinition("IW-CANDIDATE-OK", "straight-stair", new()
+    {
+        ["rise"] = 2.88,
+        ["run"] = 5.4,
+        ["width"] = 1.1,
+        ["risers"] = 18,
+        ["railHeight"] = 1.1
+    });
+    var candidate = ExecutionGate.Evaluate("bake", source, ExecutionPolicy.Default, false, standards,
+        new StandardDesignContext(StandardDesignContext.StandardCandidate));
+    Check(candidate.Automatic);
+});
+Test("outdoor egress candidate checks stair pitch", () =>
+{
+    string root = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../.."));
+    var standards = StandardBaseline.Load(Path.Combine(root, "policies/iceworld-standard-baseline.json"));
+    var source = new ExampleDefinition("IW-CANDIDATE-PITCH", "straight-stair", new()
+    {
+        ["rise"] = 2.88,
+        ["run"] = 2.0,
+        ["width"] = 1.1,
+        ["risers"] = 18,
+        ["railHeight"] = 1.1
+    });
+    var decision = ExecutionGate.Evaluate("bake", source, ExecutionPolicy.Default, false, standards,
+        new StandardDesignContext(StandardDesignContext.StandardCandidate, OutdoorEgressStair: true));
+    Check(!decision.Automatic && decision.Reason.Contains("pitch", StringComparison.OrdinalIgnoreCase));
+});
 
 if (args.Length == 2 && args[0] == "--examples")
 {
@@ -100,6 +150,38 @@ if (args.Length == 2 && args[0] == "--examples")
     Test("warehouse contains example JSON sources", () => Check(files.Length >= 6));
     foreach (string file in files)
         Test("validate indexed numeric source " + Path.GetFileName(file), () => ExampleEngine.Parse(File.ReadAllText(file)));
+}
+if (args.Length == 2 && args[0] == "--warehouse")
+{
+    var catalog = WarehouseCatalog.Load(args[1]);
+    Test("catalog loads all indexed examples", () =>
+    {
+        Check(catalog.Examples.Count == 6);
+        foreach (var example in catalog.Examples)
+        {
+            var source = catalog.LoadDefinition(example);
+            Check(source.Id == example.Id && source.Kind == example.Kind);
+        }
+    });
+    Test("catalog loads execution and standards policies", () =>
+    {
+        Check(catalog.LoadExecutionPolicy().MaximumParts == ExampleEngine.MaximumParts);
+        Check(catalog.LoadStandardBaseline().ReviewStatus == "candidate");
+    });
+    Test("catalog resolves a stable example by ID", () =>
+        Check(catalog.Require("IW-STRAIGHT-STAIR").Category == "circulation/stairs"));
+    Test("catalog rejects unknown IDs", () =>
+    {
+        try { catalog.Require("IW-NOT-FOUND"); }
+        catch (InvalidOperationException) { return; }
+        throw new Exception("Expected unknown ID rejection");
+    });
+    Test("catalog rejects path escape", () =>
+    {
+        try { catalog.ResolveArtifact("../outside.json"); }
+        catch (InvalidOperationException) { return; }
+        throw new Exception("Expected path escape rejection");
+    });
 }
 
 Console.WriteLine($"RESULT {passed}/{passed + failed} passed, {failed} failed");

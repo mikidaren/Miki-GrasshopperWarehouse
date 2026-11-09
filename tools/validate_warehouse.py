@@ -32,7 +32,8 @@ def validate(root, index):
     report_path = root / "docs/iceworld-native-validation.json"
     report = read_json(report_path) if report_path.is_file() else {"results": []}
     evidence = {entry["id"]: entry for entry in report["results"]}
-    code_files = sorted([*(root / "src/Miki.IceWorld").glob("*.cs"), *(root / "src/Miki.IceWorld.Grasshopper").glob("*.cs")], key=lambda p: p.relative_to(root).as_posix())
+    code_files = sorted([*(root / "src/Miki.IceWorld").glob("*.cs"), *(root / "src/Miki.IceWorld.Rhino").glob("*.cs"),
+                         *(root / "src/Miki.IceWorld.Grasshopper").glob("*.cs")], key=lambda p: p.relative_to(root).as_posix())
     code_hashes = "\n".join(p.relative_to(root).as_posix() + " " + hashlib.sha256(p.read_bytes()).hexdigest() for p in code_files)
     kernel_hash = hashlib.sha256(code_hashes.encode()).hexdigest()
     required = {"id", "kind", "title", "category", "tags", "source", "definition", "units", "runtime", "stage", "validation"}

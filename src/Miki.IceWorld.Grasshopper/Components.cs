@@ -1,4 +1,5 @@
 using Grasshopper.Kernel;
+using Miki.IceWorld.Rhino;
 using Rhino;
 using System.Drawing;
 using System.Text.Json;
@@ -48,7 +49,7 @@ public abstract class ExampleComponent : GH_Component
             // Preview follows Rhino document units just as the enforced bake entry point does.
             var document = RhinoDoc.ActiveDoc;
             double scale = document is null ? 1 : RhinoMath.UnitScale(UnitSystem.Meters, document.ModelUnitSystem);
-            var native = NativeExamples.Build(source, scale, .001 * scale);
+            var native = IceWorldRhino.Build(source, scale, .001 * scale);
             access.SetDataList(0, native.Geometry); access.SetDataList(1, native.Roles);
             access.SetData(2, JsonSerializer.Serialize(source, ExampleEngine.JsonOptions));
             access.SetData(3, $"{Kind} | {native.Geometry.Length} closed Breps | source units m | TEST DIMENSIONS | project dimensions/capacity undecided");
@@ -124,9 +125,29 @@ public sealed class ApprovedBakeComponent() : GH_Component("Approved Bake", "Bak
                 return;
             }
             var document = RhinoDoc.ActiveDoc ?? throw new InvalidOperationException("Open a Rhino document before baking.");
-            var ids = NativeExamples.Bake(document, source, policy);
-            access.SetData(0, $"Automatically approved and created {ids.Length} owned objects.");
+            var catalog = FindCatalog(libraryDirectory);
+            StandardBaseline? standards = null;
+            StandardDesignContext? context = null;
+            if (catalog is not null && catalog.Find(source.Id) is { } entry)
+            {
+                standards = catalog.LoadStandardBaseline();
+                context = StandardDesignContext.FromCatalog(entry);
+            }
+            var ids = IceWorldRhino.Bake(document, source, policy, standards, context);
+            access.SetData(0, $"Automatically approved and created {ids.Length} owned objects." +
+                (standards is null ? " No warehouse catalog entry supplied a standards stage." : ""));
         }
         catch (InvalidOperationException error) { access.SetData(0, "Requires host decision — " + error.Message); }
+    }
+
+    private static WarehouseCatalog? FindCatalog(string libraryDirectory)
+    {
+        DirectoryInfo? directory = new(libraryDirectory);
+        for (int depth = 0; directory is not null && depth < 4; depth++, directory = directory.Parent)
+        {
+            if (File.Exists(Path.Combine(directory.FullName, "examples", "index.json")))
+                return WarehouseCatalog.Load(directory.FullName);
+        }
+        return null;
     }
 }

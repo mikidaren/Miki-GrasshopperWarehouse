@@ -9,6 +9,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../../src/Miki.IceWorld.Grasshopper/Miki.IceWorld.Grasshopper.csproj" />
+    <ProjectReference Include="../../src/Miki.OpenBim.Rhino/Miki.OpenBim.Rhino.csproj" />
     <PackageReference Include="Rhino.Inside" Version="9.0.26084.13070-beta" />
   </ItemGroup>
   <Target Name="CopyQaGrasshopperAssembly" AfterTargets="Build">
