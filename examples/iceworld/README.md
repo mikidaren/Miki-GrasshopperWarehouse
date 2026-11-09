@@ -47,3 +47,5 @@ GH 重算只更新预览。烘焙由按钮上升沿触发，批准后建立按�
 同一文档已有相同示例 ID 时，执行入口返回需要宿主处理更新的决定。需要多个独立实例时，宿主应提供不同的合法 ID。当前示例按钮负责新建流程。
 
 完整规则见 `docs/approval-rules.md`，分类规则见 `docs/warehouse-index.md`，原生证据见 `docs/iceworld-validation.md`。
+
+<!-- automatic-approval-smoke -->
